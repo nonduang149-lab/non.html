@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Web OS</title>
+<style>
+  :root{
+    --bg:#101318;
+    --bg-accent:#151a22;
+    --glass:rgba(255,255,255,0.06);
+    --glass-strong:rgba(255,255,255,0.1);
+    --text:#e9ecf1;
+    --muted:#a9b2c0;
+    --accent:#4da3ff;
+    --accent-2:#7ae1c3;
+    --shadow:0 10px 30px rgba(0,0,0,0.4);
+    --radius:12px;
+  }
+  html,body{
+    margin:0; padding:0; height:100%; background:var(--bg); color:var(--text); font-family:Inter, Segoe UI, Roboto, Arial, sans-serif;
+    user-select:none; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  }
+  /* Desktop */
+  .desktop {
+    position:fixed; inset:0; overflow:hidden;
+    background:
+      radial-gradient(1200px 600px at 80% 10%, rgba(77,163,255,0.12), transparent 60%),
+      radial-gradient(800px 400px at 20% 90%, rgba(122,225,195,0.10), transparent 60%),
+      linear-gradient(180deg, #0c0f14, #0f1319 40%, #0d1117);
+  }
+  .wallpaper-overlay{
+    position:absolute; inset:0; background:linear-gradient(120deg, transparent 0% 60%, rgba(255,255,255,0.03) 100%);
+    pointer-events:none;
+  }
+  /* Desktop icons */
+  .icons {
+    position:absolute; top:20px; left:20px; display:grid; gap:14px;
+    grid-template-columns:repeat(auto-fill, 90px);
+    max-width:60vw;
+  }
+  .icon {
+    width:90px; height:90px; padding:10px; display:flex; flex-direction:column; align-items:center; gap:8px;
+    border-radius:10px; background:transparent; transition:0.15s ease; cursor:pointer;
+  }
+  .icon:hover{ background:var(--glass); }
+  .icon .glyph {
+    width:42px; height:42px; border-radius:10px; display:grid; place-items:center; font-weight:700; color:#0b0f14;
+    background:linear-gradient(135deg, var(--accent), #7ab7ff);
+    box-shadow:0 6px 18px rgba(77,163,255,0.4), inset 0 0 0 1px rgba(255,255,255,0.25);
+  }
+  .icon.notes .glyph{ background:linear-gradient(135deg, #ffd76a, #ffc04d); }
+  .icon.calc .glyph{ background:linear-gradient(135deg, #ff7aa2, #ff4da0); }
+  .icon.files .glyph{ background:linear-gradient(135deg, #7ae1c3, #49d3a7); }
+  .icon.term .glyph{ background:linear-gradient(135deg, #b97aff, #7a9bff); }
+  .icon span { font-size:12px; color:var(--muted); text-align:center; line-height:1.2; }
+
+  /* Taskbar */
+  .taskbar {
+    position:absolute; left:12px; right:12px; bottom:12px; height:48px;
+    background:rgba(10,12,16,0.55);
+    backdrop-filter: blur(12px);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:14px; box-shadow:var(--shadow);
+    display:flex; align-items:center; padding:0 10px; gap:10px;
+  }
+  .start {
+    height:36px; min-width:36px; padding:0 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.08);
+    display:flex; align-items:center; gap:8px; cursor:pointer; background:var(--glass-strong);
+  }
+  .start:hover{ background:rgba(255,255,255,0.14); }
+  .start .logo {
+    width:18px; height:18px; background:linear-gradient(135deg, var(--accent-2), var(--accent));
+    border-radius:4px; box-shadow:inset 0 0 0 1px rgba(255,255,255,0.35);
+  }
+  .tasklist{ display:flex; align-items:center; gap:8px; flex:1; overflow:hidden; }
+  .task {
+    max-width:160px; min-width:90px; height:36px; padding:0 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.08);
+    display:flex; align-items:center; gap:8px; cursor:pointer; background:rgba(255,255,255,0.04);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--muted);
+  }
+  .task.active{ background:rgba(77,163,255,0.18); color:var(--text); }
+  .tray { margin-left:auto; display:flex; align-items:center; gap:10px; }
+  .clock { font-variant-numeric:tabular-nums; color:var(--text); opacity:0.9; font-weight:600; }
+
+  /* Start menu */
+  .menu {
+    position:absolute; bottom:70px; left:12px; width:320px; background:rgba(14,17,23,0.7);
+    border:1px solid rgba(255,255,255,0.08); border-radius:16px; box-shadow:var(--shadow);
+    backdrop-filter: blur(16px); display:none; padding:12px;
+  }
+  .menu h4{ margin:8px 8px 10px; font-size:13px; color:var(--muted); font-weight:600; }
+  .menu .apps{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
+  .menu .app {
+    height:72px; border-radius:12px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; cursor:pointer;
+    transition:0.15s ease;
+  }
+  .menu .app:hover{ background:rgba(255,255,255,0.12); }
+  .menu .app .dot{ width:14px; height:14px; border-radius:4px; background:linear-gradient(135deg, var(--accent), #7ab7ff); }
+  .menu .app span{ font-size:12px; color:var(--text); }
+
+  /* Windows */
+  .window {
+    position:absolute; width:560px; min-width:320px; min-height:220px;
+    background:rgba(18,22,29,0.85); border:1px solid rgba(255,255,255,0.08);
+    border-radius:16px; box-shadow:var(--shadow); backdrop-filter: blur(14px);
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  .titlebar {
+    height:38px; display:flex; align-items:center; padding:0 10px; gap:10px; cursor:move;
+    background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .traffic { display:flex; align-items:center; gap:8px; }
+  .dot { width:12px; height:12px; border-radius:50%; }
+  .close { background:#ff5f57; border:1px solid #e0443e; }
+  .minimize { background:#febc2e; border:1px solid #e0a100; }
+  .zoom { background:#28c840; border:1px solid #12a82a; }
+  .wtitle{ font-weight:600; color:var(--text); flex:1; }
+  .content{ flex:1; padding:12px; overflow:auto; }
+
+  /* App content */
+  .notes textarea{
+    width:100%; height:100%; resize:none; outline:none; border:none; border-radius:8px;
+    padding:12px; font: 500 14px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    color:#0e1320; background:linear-gradient(180deg, #fffdf7, #fff9e9);
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,0.06);
+    user-select:text;
+  }
+  .calc-grid{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:8px;
+  }
+  .calc-screen{
+    grid-column:1/-1; height:54px; background:#0b0f16; border:1px solid rgba(255,255,255,0.08);
+    border-radius:10px; display:flex; align-items:center; justify-content:flex-end; padding:0 12px;
+    font-variant-numeric:tabular-nums; font-size:20px; color:var(--accent-2);
+  }
+  .btn{
+    height:44px; border-radius:10px; border:1px solid rgba(255,255,255,0.08);
+    background:rgba(255,255,255,0.06); color:var(--text); font-weight:600; cursor:pointer;
+  }
+  .btn.op{ background:rgba(77,163,255,0.16); }
+  .files-list{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:10px;
+  }
+  .file{
+    padding:10px; border-radius:10px; background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.08); cursor:pointer;
+  }
+  .preview{
+    margin-top:10px; padding:10px; border-radius:10px; background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.08); min-height:80px; white-space:pre-wrap;
+    user-select:text;
+  }
+
+  /* Selection safety */
+  .content, .content * { user-select:text; }
+</style>
+</head>
+<body>
+  <div class="desktop" id="desktop">
+    <div class="wallpaper-overlay"></div>
+
+    <div class="icons">
+      <div class="icon notes" data-app="notes" title="Notes">
+        <div class="glyph">N</div><span>Notes</span>
+      </div>
+      <div class="icon calc" data-app="calc" title="Calculator">
+        <div class="glyph">C</div><span>Calculator</span>
+      </div>
+      <div class="icon files" data-app="files" title="Files">
+        <div class="glyph">F</div><span>Files</span>
+      </div>
+      <div class="icon term" data-app="about" title="About">
+        <div class="glyph">⌘</div><span>About</span>
+      </div>
+    </div>
+
+    <div class="taskbar">
+      <div class="start" id="startBtn">
+        <div class="logo"></div>
+        <span>Start</span>
+      </div>
+      <div class="tasklist" id="tasklist"></div>
+      <div class="tray">
+        <div class="clock" id="clock">--:--</div>
+      </div>
+    </div>
+
+    <div class="menu" id="menu">
+      <h4>Pinned</h4>
+      <div class="apps">
+        <div class="app" data-app="notes"><div class="dot"></div><span>Notes</span></div>
+        <div class="app" data-app="calc"><div class="dot"></div><span>Calculator</span></div>
+        <div class="app" data-app="files"><div class="dot"></div><span>Files</span></div>
+        <div class="app" data-app="about"><div class="dot"></div><span>About</span></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const desktop = document.getElementById('desktop');
+  const tasklist = document.getElementById('tasklist');
+  const menu = document.getElementById('menu');
+  const startBtn = document.getElementById('startBtn');
+  const clockEl = document.getElementById('clock');
+
+  let zTop = 10;
+  let winId = 0;
+  const tasks = new Map(); // winId -> task button
+  const windows = new Map(); // winId -> window element
+
+  // Clock
+  function updateClock(){
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2,'0');
+    const mm = String(now.getMinutes()).padStart(2,'0');
+    clockEl.textContent = `${hh}:${mm}`;
+  }
+  updateClock(); setInterval(updateClock, 1000*15);
+
+  // Start menu
+  startBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+  });
+  document.addEventListener('click', () => { menu.style.display = 'none'; });
+  menu.addEventListener('click', (e)=> e.stopPropagation());
+
+  // Desktop icons & start menu apps
+  function openApp(app){ apps[app]?.(); }
+  document.querySelectorAll('.icon').forEach(i => i.addEventListener('dblclick', ()
