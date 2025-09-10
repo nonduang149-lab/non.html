@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Simple Web Apps</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; }
+    h2 { margin-top: 40px; }
+    .app { background: white; padding: 20px; margin-bottom: 30px; border-radius: 8px; box-shadow: 0 0 10px #ccc; }
+    input, button { margin: 5px; padding: 8px; }
+  </style>
+</head>
+<body>
+
+  <h1>🛠️ Simple Web Apps</h1>
+
+  <!-- Calculator -->
+  <div class="app">
+    <h2>🧮 Calculator</h2>
+    <input type="number" id="num1" placeholder="First number">
+    <input type="number" id="num2" placeholder="Second number">
+    <button onclick="calculate()">Add</button>
+    <p id="calcResult"></p>
+    <script>
+      function calculate() {
+        const a = parseFloat(document.getElementById('num1').value);
+        const b = parseFloat(document.getElementById('num2').value);
+        document.getElementById('calcResult').textContent = `Result: ${a + b}`;
+      }
+    </script>
+  </div>
+
+  <!-- To-Do List -->
+  <div class="app">
+    <h2>📝 To-Do List</h2>
+    <input type="text" id="todoInput" placeholder="New task">
+    <button onclick="addTodo()">Add</button>
+    <ul id="todoList"></ul>
+    <script>
+      function addTodo() {
+        const input = document.getElementById('todoInput');
+        const li = document.createElement('li');
+        li.textContent = input.value;
+        document.getElementById('todoList').appendChild(li);
+        input.value = '';
+      }
+    </script>
+  </div>
+
+  <!-- Digital Clock -->
+  <div class="app">
+    <h2>⏰ Digital Clock</h2>
+    <p id="clock"></p>
+    <script>
+      function updateClock() {
+        const now = new Date();
+        document.getElementById('clock').textContent = now.toLocaleTimeString();
+      }
+      setInterval(updateClock, 1000);
+      updateClock();
+    </script>
+  </div>
+
+  <!-- Color Picker -->
+  <div class="app">
+    <h2🎨>Color Picker</h2>
+    <input type="color" id="colorInput" onchange="changeColor()">
+    <p id="colorDisplay">Pick a color!</p>
+    <script>
+      function changeColor() {
+        const color = document.getElementById('colorInput').value;
+        document.getElementById('colorDisplay').textContent = `You picked: ${color}`;
+        document.getElementById('colorDisplay').style.color = color;
+      }
+    </script>
+  </div>
+
+</body>
+</html>
