@@ -2,78 +2,238 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Simple Web Apps</title>
+  <title>Mini Hub: YouTube + Browser</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f4f4; }
-    h2 { margin-top: 40px; }
-    .app { background: white; padding: 20px; margin-bottom: 30px; border-radius: 8px; box-shadow: 0 0 10px #ccc; }
-    input, button { margin: 5px; padding: 8px; }
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #22d3ee;
+      --btn: #1f2937;
+      --tile: #0b1220;
+      --input: #0b1220;
+      --border: #26324a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 24px; font-family: Inter, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 20% 0%, #0b1220 0%, var(--bg) 60%, #0a0f1a 100%);
+      color: var(--text);
+    }
+    h1 { margin: 0 0 18px; letter-spacing: 0.2px; }
+    p.lead { margin-top: 0; color: var(--muted); }
+    .grid {
+      display: grid; gap: 18px;
+      grid-template-columns: repeat(12, 1fr);
+    }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      backdrop-filter: blur(4px);
+    }
+    .card h2 { margin: 4px 0 12px; font-size: 18px; }
+    .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    input[type="text"], input[type="url"], input[type="search"] {
+      background: var(--input); color: var(--text); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 12px; min-width: 220px; outline: none;
+    }
+    input::placeholder { color: #6b7280; }
+    button {
+      background: var(--btn); color: var(--text); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 14px; cursor: pointer;
+    }
+    button:hover { border-color: #3b82f6; }
+    .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+    .tile {
+      background: linear-gradient(160deg, var(--tile), #0f1a2a);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px; text-decoration: none; color: var(--text);
+      display: flex; gap: 10px; align-items: center; transition: transform 0.08s ease;
+    }
+    .tile:hover { transform: translateY(-2px); border-color: #3b82f6; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+    iframe {
+      width: 100%; height: 380px; border: 1px solid var(--border); border-radius: 12px;
+      background: #000;
+    }
+    .hint { color: var(--muted); font-size: 12px; margin-top: 6px; }
+    .badge { background: #0a0f1a; border: 1px solid var(--border); color: var(--muted); padding: 4px 8px; border-radius: 999px; font-size: 12px; }
+    .footer { margin-top: 18px; color: var(--muted); font-size: 12px; }
+    /* layout */
+    .span-8 { grid-column: span 8; }
+    .span-4 { grid-column: span 4; }
+    .span-12 { grid-column: span 12; }
+    @media (max-width: 1000px) {
+      .span-8, .span-4, .span-12 { grid-column: span 12; }
+      iframe { height: 320px; }
+    }
   </style>
 </head>
 <body>
+  <h1>Mini Hub</h1>
+  <p class="lead">Quick YouTube player, a tiny browser pane, and handy launch tiles — all in one HTML file.</p>
 
-  <h1>🛠️ Simple Web Apps</h1>
+  <div class="grid">
+    <!-- Quick launch tiles -->
+    <section class="card span-4">
+      <h2>Launch</h2>
+      <div class="tiles">
+        <a class="tile" href="https://www.youtube.com" target="_blank" rel="noopener">
+          <span class="dot"></span><span>YouTube</span>
+        </a>
+        <a class="tile" href="https://www.google.com" target="_blank" rel="noopener">
+          <span class="dot"></span><span>Google</span>
+        </a>
+        <a class="tile" href="https://mail.google.com" target="_blank" rel="noopener">
+          <span class="dot"></span><span>Gmail</span>
+        </a>
+        <a class="tile" href="https://en.wikipedia.org" target="_blank" rel="noopener">
+          <span class="dot"></span><span>Wikipedia</span>
+        </a>
+        <a class="tile" href="https://translate.google.com" target="_blank" rel="noopener">
+          <span class="dot"></span><span>Translate</span>
+        </a>
+        <a class="tile" href="https://maps.google.com" target="_blank" rel="noopener">
+          <span class="dot"></span><span>Maps</span>
+        </a>
+      </div>
+      <p class="hint">These open in your default browser. You can set Chrome as default in your system settings.</p>
+    </section>
 
-  <!-- Calculator -->
-  <div class="app">
-    <h2>🧮 Calculator</h2>
-    <input type="number" id="num1" placeholder="First number">
-    <input type="number" id="num2" placeholder="Second number">
-    <button onclick="calculate()">Add</button>
-    <p id="calcResult"></p>
-    <script>
-      function calculate() {
-        const a = parseFloat(document.getElementById('num1').value);
-        const b = parseFloat(document.getElementById('num2').value);
-        document.getElementById('calcResult').textContent = `Result: ${a + b}`;
-      }
-    </script>
+    <!-- YouTube player -->
+    <section class="card span-8">
+      <div class="row" style="justify-content: space-between;">
+        <h2>YouTube player</h2>
+        <span class="badge">Paste URL or ID</span>
+      </div>
+      <div class="row">
+        <input id="ytInput" type="text" placeholder="e.g., https://youtu.be/dQw4w9WgXcQ or video ID" />
+        <button id="ytLoadBtn">Load</button>
+        <input id="ytSearch" type="search" placeholder="Search YouTube..." />
+        <button id="ytSearchBtn">Search</button>
+      </div>
+      <div class="hint">Tip: Works with watch, youtu.be, shorts, and embed links. Search opens in a new tab.</div>
+      <div style="margin-top: 10px;">
+        <iframe id="ytFrame" src="https://www.youtube.com/embed/?autoplay=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      </div>
+    </section>
+
+    <!-- Mini browser -->
+    <section class="card span-12">
+      <div class="row" style="justify-content: space-between;">
+        <h2>Mini browser</h2>
+        <span class="badge">Some sites block embedding</span>
+      </div>
+      <div class="row">
+        <input id="addr" type="url" placeholder="Enter URL (https://...)" value="https://example.com" />
+        <button id="goBtn">Go</button>
+        <button id="newTabBtn">Open in new tab</button>
+        <input id="gSearch" type="search" placeholder="Google search..." />
+        <button id="gBtn">Search</button>
+      </div>
+      <div class="hint">If a site sets X‑Frame‑Options or CSP to disallow embedding, use “Open in new tab”.</div>
+      <div style="margin-top: 10px;">
+        <iframe id="miniFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" src="https://example.com"></iframe>
+      </div>
+    </section>
   </div>
 
-  <!-- To-Do List -->
-  <div class="app">
-    <h2>📝 To-Do List</h2>
-    <input type="text" id="todoInput" placeholder="New task">
-    <button onclick="addTodo()">Add</button>
-    <ul id="todoList"></ul>
-    <script>
-      function addTodo() {
-        const input = document.getElementById('todoInput');
-        const li = document.createElement('li');
-        li.textContent = input.value;
-        document.getElementById('todoList').appendChild(li);
-        input.value = '';
-      }
-    </script>
+  <div class="footer">
+    Built with plain HTML/CSS/JS. No keys or extensions required.
   </div>
 
-  <!-- Digital Clock -->
-  <div class="app">
-    <h2>⏰ Digital Clock</h2>
-    <p id="clock"></p>
-    <script>
-      function updateClock() {
-        const now = new Date();
-        document.getElementById('clock').textContent = now.toLocaleTimeString();
-      }
-      setInterval(updateClock, 1000);
-      updateClock();
-    </script>
-  </div>
+  <script>
+    // ---- YouTube helpers ----
+    function getYouTubeID(input) {
+      if (!input) return "";
+      const trimmed = input.trim();
+      // If it looks like a plain ID (11 chars typical), accept it
+      if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
 
-  <!-- Color Picker -->
-  <div class="app">
-    <h2🎨>Color Picker</h2>
-    <input type="color" id="colorInput" onchange="changeColor()">
-    <p id="colorDisplay">Pick a color!</p>
-    <script>
-      function changeColor() {
-        const color = document.getElementById('colorInput').value;
-        document.getElementById('colorDisplay').textContent = `You picked: ${color}`;
-        document.getElementById('colorDisplay').style.color = color;
+      try {
+        const u = new URL(trimmed);
+        // youtu.be/<id>
+        if (u.hostname.endsWith("youtu.be")) {
+          return u.pathname.slice(1).split("/")[0];
+        }
+        // youtube.com/watch?v=ID or /live/ID or /embed/ID or /shorts/ID
+        if (u.hostname.includes("youtube.com")) {
+          const v = u.searchParams.get("v");
+          if (v) return v;
+          const parts = u.pathname.split("/").filter(Boolean);
+          const idx = parts.findIndex(p => ["embed","shorts","live","watch"].includes(p));
+          if (idx >= 0 && parts[idx+1]) return parts[idx+1];
+          if (parts[0]) return parts[0];
+        }
+      } catch(e) {
+        // not a URL, fall through
       }
-    </script>
-  </div>
+      // Try to extract with regex from any string
+      const m = trimmed.match(/([a-zA-Z0-9_-]{11})/);
+      return m ? m[1] : "";
+    }
 
+    function loadYouTube() {
+      const val = document.getElementById("ytInput").value;
+      const id = getYouTubeID(val);
+      const frame = document.getElementById("ytFrame");
+      if (!id) {
+        frame.src = "https://www.youtube.com/embed/?autoplay=0";
+        alert("Could not detect a valid YouTube video ID.");
+        return;
+      }
+      frame.src = "https://www.youtube.com/embed/" + encodeURIComponent(id) + "?autoplay=1";
+    }
+
+    function ytSearch() {
+      const q = document.getElementById("ytSearch").value.trim();
+      if (!q) return;
+      const url = "https://www.youtube.com/results?search_query=" + encodeURIComponent(q);
+      window.open(url, "_blank", "noopener");
+    }
+
+    document.getElementById("ytLoadBtn").addEventListener("click", loadYouTube);
+    document.getElementById("ytSearchBtn").addEventListener("click", ytSearch);
+    document.getElementById("ytInput").addEventListener("keydown", (e)=>{ if(e.key==="Enter") loadYouTube(); });
+    document.getElementById("ytSearch").addEventListener("keydown", (e)=>{ if(e.key==="Enter") ytSearch(); });
+
+    // ---- Mini browser ----
+    const addr = document.getElementById("addr");
+    const frame = document.getElementById("miniFrame");
+
+    function normalizeURL(u) {
+      if (!u) return "";
+      let s = u.trim();
+      if (!/^https?:\/\//i.test(s)) s = "https://" + s;
+      return s;
+    }
+
+    function go() {
+      const url = normalizeURL(addr.value);
+      if (!url) return;
+      frame.src = url;
+    }
+    function openNewTab() {
+      const url = normalizeURL(addr.value);
+      if (!url) return;
+      window.open(url, "_blank", "noopener");
+    }
+    function gSearch() {
+      const q = document.getElementById("gSearch").value.trim();
+      if (!q) return;
+      window.open("https://www.google.com/search?q=" + encodeURIComponent(q), "_blank", "noopener");
+    }
+
+    document.getElementById("goBtn").addEventListener("click", go);
+    document.getElementById("newTabBtn").addEventListener("click", openNewTab);
+    document.getElementById("gBtn").addEventListener("click", gSearch);
+    addr.addEventListener("keydown", (e)=>{ if(e.key==="Enter") go(); });
+    document.getElementById("gSearch").addEventListener("keydown", (e)=>{ if(e.key==="Enter") gSearch(); });
+  </script>
 </body>
 </html>
+
