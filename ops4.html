@@ -2,39 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Full Screen Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Split Screen: YouTube + Google</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
       overflow: hidden;
-      font-family: Arial, sans-serif;
     }
-    #container {
+    #wrapper {
       display: flex;
-      flex-direction: column;
       height: 100%;
+      width: 100%;
     }
-    #search-bar {
-      padding: 10px;
-      background: #f0f0f0;
-      display: flex;
-      justify-content: center;
-    }
-    #search-bar input {
-      width: 60%;
-      padding: 8px;
-      font-size: 16px;
-    }
-    #search-bar button {
-      padding: 8px 12px;
-      margin-left: 10px;
-      font-size: 16px;
-    }
-    #video-frame {
-      flex-grow: 1;
+    .panel {
+      flex: 1;
+      border: none;
     }
     iframe {
       width: 100%;
@@ -44,23 +28,14 @@
   </style>
 </head>
 <body>
-  <div id="container">
-    <div id="search-bar">
-      <input type="text" id="searchInput" placeholder="Search Google..." />
-      <button onclick="searchGoogle()">Search</button>
+  <div id="wrapper">
+    <div class="panel">
+      <iframe src="https://www.youtube.com/embed/5qap5aO4i9A" allowfullscreen></iframe>
     </div>
-    <div id="video-frame">
-      <iframe id="youtubePlayer" src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
+    <div class="panel">
+      <iframe src="https://www.google.com" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
     </div>
   </div>
-
-  <script>
-    function searchGoogle() {
-      const query = document.getElementById('searchInput').value;
-      if (query.trim()) {
-        window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
-      }
-    }
-  </script>
 </body>
 </html>
+
