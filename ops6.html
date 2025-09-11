@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Google & YouTube Portal</title>
+  <title>Google & YouTube Viewer</title>
   <style>
     body {
       background-color: #001f3f; /* Dark Blue */
@@ -12,18 +12,20 @@
       padding: 20px;
     }
     input[type="text"] {
-      width: 300px;
+      width: 400px;
       padding: 10px;
       border: none;
       border-radius: 5px;
+      margin-bottom: 10px;
     }
-    input[type="submit"] {
+    input[type="submit"], button {
       padding: 10px 20px;
       border: none;
       border-radius: 5px;
       background-color: #0074D9;
       color: white;
       cursor: pointer;
+      margin: 5px;
     }
     iframe {
       margin-top: 30px;
@@ -34,7 +36,7 @@
   </style>
 </head>
 <body>
-  <h1>Welcome to Your Portal</h1>
+  <h1>Google Search & YouTube Viewer</h1>
 
   <!-- Google Search Form -->
   <form action="https://www.google.com/search" method="GET" target="_blank">
@@ -42,12 +44,31 @@
     <input type="submit" value="Search">
   </form>
 
-  <!-- Embedded YouTube Video -->
-  <iframe 
-    src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
-    title="YouTube video player" 
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-    allowfullscreen>
-  </iframe>
+  <!-- YouTube Link Input -->
+  <div>
+    <input type="text" id="youtubeLink" placeholder="Paste YouTube link here">
+    <button onclick="loadVideo()">Watch Video</button>
+  </div>
+
+  <!-- YouTube Video Player -->
+  <iframe id="videoPlayer" src="" allowfullscreen></iframe>
+
+  <script>
+    function loadVideo() {
+      const link = document.getElementById('youtubeLink').value;
+      const videoId = extractVideoID(link);
+      if (videoId) {
+        document.getElementById('videoPlayer').src = `https://www.youtube.com/embed/${videoId}`;
+      } else {
+        alert("Please enter a valid YouTube link.");
+      }
+    }
+
+    function extractVideoID(url) {
+      const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
+      return match ? match[1] : null;
+    }
+  </script>
 </body>
 </html>
+
