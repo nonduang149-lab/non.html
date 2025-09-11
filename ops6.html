@@ -36,39 +36,4 @@
   </style>
 </head>
 <body>
-  <h1>Google Search & YouTube Viewer</h1>
-
-  <!-- Google Search Form -->
-  <form action="https://www.google.com/search" method="GET" target="_blank">
-    <input type="text" name="q" placeholder="Search Google...">
-    <input type="submit" value="Search">
-  </form>
-
-  <!-- YouTube Link Input -->
-  <div>
-    <input type="text" id="youtubeLink" placeholder="Paste YouTube link here">
-    <button onclick="loadVideo()">Watch Video</button>
-  </div>
-
-  <!-- YouTube Video Player -->
-  <iframe id="videoPlayer" src="" allowfullscreen></iframe>
-
-  <script>
-    function loadVideo() {
-      const link = document.getElementById('youtubeLink').value;
-      const videoId = extractVideoID(link);
-      if (videoId) {
-        document.getElementById('videoPlayer').src = `https://www.youtube.com/embed/${videoId}`;
-      } else {
-        alert("Please enter a valid YouTube link.");
-      }
-    }
-
-    function extractVideoID(url) {
-      const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/);
-      return match ? match[1] : null;
-    }
-  </script>
-</body>
-</html>
-
+  
